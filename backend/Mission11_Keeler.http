@@ -1,0 +1,11 @@
+@Mission11_Keeler_HostAddress = http://localhost:5174
+
+GET {{Mission11_Keeler_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{Mission11_Keeler_HostAddress}}/api/Book
+Accept: application/json
+
+###
