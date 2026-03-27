@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { Book } from '../types/Book';
 
-function BookList() {
+interface BookListProps {
+    selectedCategories: string[];
+}
+
+function BookList({ selectedCategories }: BookListProps) {
     const [books, setBooks] = useState<Book[]>([]);
     const [totalBooks, setTotalBooks] = useState(0);
     const [pageNum, setPageNum] = useState(1);
@@ -9,18 +13,23 @@ function BookList() {
     const [sortAsc, setSortAsc] = useState(true);
 
     useEffect(() => {
-        fetch(`http://localhost:5174/api/book?pageNum=${pageNum}&numBooks=${numBooks}&sortAsc=${sortAsc}`)
+        setPageNum(1);
+    }, [selectedCategories]);
+
+    useEffect(() => {
+        const categoryParams = selectedCategories.map(c => `&categories=${encodeURIComponent(c)}`).join('');
+        fetch(`https://localhost:5001/api/book?pageNum=${pageNum}&numBooks=${numBooks}&sortAsc=${sortAsc}${categoryParams}`)
             .then(res => res.json())
             .then(data => {
                 setBooks(data.books);
                 setTotalBooks(data.totalBooks);
             });
-    }, [pageNum, numBooks, sortAsc]);
+    }, [pageNum, numBooks, sortAsc, selectedCategories]);
 
     const totalPages = Math.ceil(totalBooks / numBooks);
 
     return (
-        <div className="container mt-4">
+        <div className="mt-4">
             <h1>Bookstore</h1>
 
             <table className="table table-striped">
