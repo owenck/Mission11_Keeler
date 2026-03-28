@@ -1,20 +1,23 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Book } from '../types/Book';
+import { useCart } from '../context/CartContext';
 
 interface BookListProps {
     selectedCategories: string[];
+    pageNum: number;
+    setPageNum: (page: number) => void;
+    numBooks: number;
+    setNumBooks: (n: number) => void;
+    sortAsc: boolean;
+    setSortAsc: (asc: boolean) => void;
 }
 
-function BookList({ selectedCategories }: BookListProps) {
+function BookList({ selectedCategories, pageNum, setPageNum, numBooks, setNumBooks, sortAsc, setSortAsc }: BookListProps) {
     const [books, setBooks] = useState<Book[]>([]);
     const [totalBooks, setTotalBooks] = useState(0);
-    const [pageNum, setPageNum] = useState(1);
-    const [numBooks, setNumBooks] = useState(5);
-    const [sortAsc, setSortAsc] = useState(true);
-
-    useEffect(() => {
-        setPageNum(1);
-    }, [selectedCategories]);
+    const navigate = useNavigate();
+    const { addToCart } = useCart();
 
     useEffect(() => {
         const categoryParams = selectedCategories.map(c => `&categories=${encodeURIComponent(c)}`).join('');
@@ -28,44 +31,66 @@ function BookList({ selectedCategories }: BookListProps) {
 
     const totalPages = Math.ceil(totalBooks / numBooks);
 
+    function handleAddToCart(book: Book) {
+        addToCart(book);
+        navigate('/cart-confirmation', {
+            state: {
+                bookTitle: book.title,
+                preserved: true,
+                selectedCategories,
+                pageNum,
+                numBooks,
+                sortAsc,
+            }
+        });
+    }
+
     return (
-        <div className="mt-4">
-            <h1>Bookstore</h1>
+        <div className="mt-4 pb-5">
+            <div className="d-flex align-items-center justify-content-between mb-3">
+                <h1>Bookstore</h1>
+                <button className="btn btn-outline-secondary btn-sm" onClick={() => setSortAsc(!sortAsc)}>
+                    Sort by Title {sortAsc ? '▲' : '▼'}
+                </button>
+            </div>
 
-            <table className="table table-striped">
-                <thead>
-                    <tr>
-                        <th style={{cursor:'pointer'}} onClick={() => setSortAsc(!sortAsc)}>
-                            Title {sortAsc ? '▲' : '▼'}
-                        </th>
-                        <th>Author</th>
-                        <th>Publisher</th>
-                        <th>ISBN</th>
-                        <th>Category</th>
-                        <th>Pages</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {books.map(book => (
-                        <tr key={book.bookId}>
-                            <td>{book.title}</td>
-                            <td>{book.author}</td>
-                            <td>{book.publisher}</td>
-                            <td>{book.isbn}</td>
-                            <td>{book.category}</td>
-                            <td>{book.pageCount}</td>
-                            <td>${book.price.toFixed(2)}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            {/* #1 & #3 — responsive card grid with nested grid inside each card */}
+            <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+                {books.map(book => (
+                    <div key={book.bookId} className="col">
+                        <div className="card h-100">
+                            <div className="card-body">
+                                <h6 className="card-title">{book.title}</h6>
+                                <p className="card-text text-muted mb-1">{book.author}</p>
+                                <p className="card-text mb-1"><small>{book.category}</small></p>
 
-            <div className="d-flex align-items-center gap-2 flex-wrap">
+                                {/* #3 — nested grid for price and pages */}
+                                <div className="row mt-2">
+                                    <div className="col-6">
+                                        <small className="text-muted">Price</small>
+                                        <div className="fw-bold">${book.price.toFixed(2)}</div>
+                                    </div>
+                                    <div className="col-6">
+                                        <small className="text-muted">Pages</small>
+                                        <div className="fw-bold">{book.pageCount}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="card-footer">
+                                <button className="btn btn-primary btn-sm w-100" onClick={() => handleAddToCart(book)}>
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="d-flex align-items-center gap-2 flex-wrap mt-3">
                 <nav>
                     <ul className="pagination mb-0">
                         <li className={`page-item ${pageNum === 1 ? 'disabled' : ''}`}>
-                            <button className="page-link" onClick={() => setPageNum(p => p - 1)}>Previous</button>
+                            <button className="page-link" onClick={() => setPageNum(pageNum - 1)}>Previous</button>
                         </li>
                         {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                             <li key={page} className={`page-item ${pageNum === page ? 'active' : ''}`}>
@@ -73,7 +98,7 @@ function BookList({ selectedCategories }: BookListProps) {
                             </li>
                         ))}
                         <li className={`page-item ${pageNum === totalPages ? 'disabled' : ''}`}>
-                            <button className="page-link" onClick={() => setPageNum(p => p + 1)}>Next</button>
+                            <button className="page-link" onClick={() => setPageNum(pageNum + 1)}>Next</button>
                         </li>
                     </ul>
                 </nav>
