@@ -1,6 +1,6 @@
 import type { Book } from '../types/Book';
 
-const API_BASE = 'https://mission13backend-dfg7chezb0g9dkdd.eastus-01.azurewebsites.net/api/books';
+const API_BASE = 'https://mission13backend-dfg7chezb0g9dkdd.eastus-01.azurewebsites.net/api/book';
 
 export async function fetchBooks(
     pageNum: number,
