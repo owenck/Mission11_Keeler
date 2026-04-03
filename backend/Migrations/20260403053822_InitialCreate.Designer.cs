@@ -10,8 +10,8 @@ using Mission11_Keeler.Data;
 namespace Mission11_Keeler.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260320204918_test")]
-    partial class test
+    [Migration("20260403053822_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

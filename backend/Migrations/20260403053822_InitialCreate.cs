@@ -5,7 +5,7 @@
 namespace Mission11_Keeler.Migrations
 {
     /// <inheritdoc />
-    public partial class test : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
