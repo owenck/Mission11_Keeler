@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fetchCategories } from '../api/BooksAPI';
 
 interface CategoryFilterProps {
     selectedCategories: string[];
@@ -9,9 +10,7 @@ function CategoryFilter({ selectedCategories, onChange }: CategoryFilterProps) {
     const [categories, setCategories] = useState<string[]>([]);
 
     useEffect(() => {
-        fetch('https://localhost:5001/api/book/categories')
-            .then(res => res.json())
-            .then(data => setCategories(data));
+        fetchCategories().then(setCategories);
     }, []);
 
     function toggle(category: string) {

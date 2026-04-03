@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Book } from '../types/Book';
 import { useCart } from '../context/CartContext';
+import { fetchBooks } from '../api/BooksAPI';
 
 interface BookListProps {
     selectedCategories: string[];
@@ -20,9 +21,7 @@ function BookList({ selectedCategories, pageNum, setPageNum, numBooks, setNumBoo
     const { addToCart } = useCart();
 
     useEffect(() => {
-        const categoryParams = selectedCategories.map(c => `&categories=${encodeURIComponent(c)}`).join('');
-        fetch(`https://localhost:5001/api/book?pageNum=${pageNum}&numBooks=${numBooks}&sortAsc=${sortAsc}${categoryParams}`)
-            .then(res => res.json())
+        fetchBooks(pageNum, numBooks, sortAsc, selectedCategories)
             .then(data => {
                 setBooks(data.books);
                 setTotalBooks(data.totalBooks);
