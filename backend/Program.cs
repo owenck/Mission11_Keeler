@@ -10,7 +10,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp", policy =>
-        policy.WithOrigins("http://localhost:3000")
+        policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader()));
 
